@@ -1,28 +1,15 @@
-import uuid
-from datetime import datetime
-
 from fastapi import APIRouter
 
 from utils.db import GenAIRag
-from utils.requestFormats import ChatCreateRequest
+from utils.request_formats import ChatCreateRequest
 
-router = APIRouter(prefix="/chat", tags=["chat"])
+session_router = APIRouter(prefix="/session", tags=["chat"])
 db = GenAIRag()
 
 
-@router.post("/create", status_code=201)
+@session_router.post("/create", status_code=201)
 def create_chat(payload: ChatCreateRequest):
-    chat_id = str(uuid.uuid4())
-
-    db.cursor.execute(
-        """
-        INSERT INTO chats (id, name, created_at)
-        VALUES (?, ?, ?)
-        """,
-        (chat_id, payload.name, datetime.now().isoformat()),
-    )
-
-    db.connection.commit()
+    chat_id = db.createChat(payload.name)
 
     return {
         "chat_id": chat_id,
@@ -30,9 +17,7 @@ def create_chat(payload: ChatCreateRequest):
     }
 
 
-@router.get("/list", status_code=200)
+@session_router.get("/list", status_code=200)
 def list_chat():
-    cursor = db.cursor.execute("SELECT * FROM chats")
-    chats = cursor.fetchall()
-    print(chats)
-    return chats
+    chats = db.listChats()
+    return {"message": "Chats fetched successfully", "chats": chats}

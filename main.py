@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 
-from session.routes import router as chat_router
+from session.routes import session_router
 from utils.basic import stream_answer
-from utils.requestFormats import QuestionRequest
+from utils.request_formats import QuestionRequest
 
 app = FastAPI(title="GenAI RAG Assistant")
 
@@ -22,4 +22,4 @@ def ask_question(payload: QuestionRequest):
 
 
 # 🔑 THIS IS THE IMPORTANT LINE
-app.include_router(chat_router)
+app.include_router(session_router)
